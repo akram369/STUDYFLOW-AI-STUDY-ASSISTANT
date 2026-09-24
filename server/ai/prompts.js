@@ -13,7 +13,8 @@ STRICT INSTRUCTIONS:
 4. Ensure factual accuracy, crisp phrasing, and high pedagogical utility.
 5. Avoid superficial questions; test conceptual understanding and recall.
 6. NO REPEATED QUESTIONS: Every question must test a completely unique concept or subtopic. NEVER generate repetitive or duplicate questions.
-7. RANDOMIZE CORRECT ANSWER POSITIONS: For quizzes, distribute correctAnswer evenly across 0, 1, 2, and 3 (never put all correct answers on the same index).`;
+7. RANDOMIZE CORRECT ANSWER POSITIONS: For quizzes, distribute correctAnswer evenly across 0, 1, 2, and 3 (never put all correct answers on the same index).
+8. COMPLETE CODE SNIPPETS: Every question must be 100% self-contained. NEVER ask "What is the output of the following code?" without including the actual code snippet! If asking about code execution or output, you MUST embed the full snippet directly inside the "question" string formatted with markdown code blocks (e.g. \`\`\`python\n...\n\`\`\`). NEVER reference missing code.`;
 
 export function buildFlashcardsPrompt(input, difficulty = 'medium') {
   const countGuideline = difficulty === 'hard' ? '8 to 12' : difficulty === 'easy' ? '5 to 7' : '6 to 10';
@@ -72,6 +73,7 @@ CRITICAL RULES FOR QUIZ:
 4. Distribute correct answers across indices 0, 1, 2, and 3 in a balanced, randomized manner (do not place the correct answer always at 0).
 5. Distractors (wrong answers) must be plausible and educational, not absurd or identical across questions.
 6. "explanation" must be informative and teach the user why the correct answer is right and why key distractors are mistaken.
+7. EMBED COMPLETE CODE SNIPPETS: If asking about code output or behavior, you MUST include the complete code snippet directly inside the "question" string using markdown code blocks (\`\`\`python\\n...\\n\`\`\`). NEVER say "following code" without the code snippet right there! Prefer conceptual questions if you do not want to embed code.
 
 JSON SCHEMA REQUIREMENT:
 {

@@ -124,6 +124,15 @@ export function normalizeStudySet(rawParsed, requestedMode) {
       const question = (q.question || q.prompt || '').toString().trim();
       if (!question) continue;
 
+      // Filter out phantom code questions where the AI referred to "following code" but forgot to include the snippet
+      const lowerQ = question.toLowerCase();
+      const hasCodePhrases = lowerQ.includes('following code') || lowerQ.includes('code below') || lowerQ.includes('following snippet') || lowerQ.includes('following python') || lowerQ.includes('following javascript');
+      const containsActualSnippet = question.includes('```') || question.includes('`') || question.includes('def ') || question.includes('function ') || question.includes('\n') || question.length > 95;
+      if (hasCodePhrases && !containsActualSnippet) {
+        console.warn(`[StudyFlow Normalize] Filtered incomplete phantom code question with missing snippet: "${question}"`);
+        continue;
+      }
+
       // Filter out repeated / duplicate questions
       const normalizedKey = question.toLowerCase().replace(/[^a-z0-9]/g, '');
       if (normalizedKey && seenQuestionPrompts.has(normalizedKey)) {

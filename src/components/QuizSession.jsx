@@ -11,6 +11,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { ProgressBar } from './ProgressBar.jsx';
+import { FormattedText } from './FormattedText.jsx';
 
 const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
@@ -184,7 +185,9 @@ export function QuizSession({
 
       {/* Quiz Card */}
       <div className="quiz-card">
-        <h3 className="quiz-question-title">{currentQuestion.question}</h3>
+        <div className="quiz-question-title">
+          <FormattedText text={currentQuestion.question} />
+        </div>
 
         <div className="quiz-options-list" role="radiogroup" aria-label="Question options">
           {currentQuestion.options.map((optText, idx) => {
@@ -240,7 +243,7 @@ export function QuizSession({
                 </>
               )}
             </div>
-            <p>{currentQuestion.explanation}</p>
+            <FormattedText text={currentQuestion.explanation} />
           </div>
         )}
       </div>
