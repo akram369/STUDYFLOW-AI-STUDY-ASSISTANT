@@ -30,7 +30,7 @@ TARGET CARD COUNT: ${countGuideline} cards.
 
 CRITICAL RULES:
 - Every card must cover a distinct sub-topic. NO duplicates.
-- Ensure crisp, authoritative answers.
+- Answers must be crisp, punchy, and pedagogical: 2 to 3 sentences maximum (around 40–60 words). Avoid giant essay walls of text.
 
 JSON SCHEMA REQUIREMENT:
 {

@@ -17,6 +17,9 @@ export function Flashcard({
     }
   };
 
+  const isQuestionLong = card.question && card.question.length > 180;
+  const isAnswerLong = card.answer && card.answer.length > 180;
+
   return (
     <div
       className="card-scene"
@@ -49,7 +52,11 @@ export function Flashcard({
             </div>
           </div>
 
-          <p className="card-content-text">{card.question}</p>
+          <div className="card-body-scroll">
+            <p className={`card-content-text ${isQuestionLong ? 'is-long' : ''}`}>
+              {card.question}
+            </p>
+          </div>
 
           <div className="card-hint">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
@@ -69,7 +76,11 @@ export function Flashcard({
             <span className="card-tag">Key Concept</span>
           </div>
 
-          <p className="card-content-text">{card.answer}</p>
+          <div className="card-body-scroll">
+            <p className={`card-content-text ${isAnswerLong ? 'is-long' : ''}`}>
+              {card.answer}
+            </p>
+          </div>
 
           <div className="card-hint">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
