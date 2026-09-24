@@ -3,7 +3,8 @@ import { AIValidationError } from './validation.js';
 
 /**
  * Normalizes raw parsed AI output to match StudyFlow's runtime schema guarantees.
- * Prevents UI crashes from missing fields, duplicate IDs, out-of-bounds answers, etc.
+ * Prevents UI crashes from missing fields, duplicate IDs, out-of-bounds answers,
+ * and eliminates duplicate/repeated questions or flashcards.
  *
  * @param {object} rawParsed - The object parsed from JSON
  * @param {string} requestedMode - 'flashcards' | 'quiz'
@@ -43,7 +44,7 @@ export function normalizeStudySet(rawParsed, requestedMode) {
     }
   }
 
-  // 2. Normalize Flashcards Deck
+  // 2. Normalize Flashcards Deck & Deduplicate Questions
   if (requestedMode === 'flashcards') {
     if (!Array.isArray(candidate.cards) || candidate.cards.length === 0) {
       throw new AIValidationError(
@@ -54,6 +55,7 @@ export function normalizeStudySet(rawParsed, requestedMode) {
     }
 
     const seenIds = new Set();
+    const seenQuestionPrompts = new Set();
     const normalizedCards = [];
 
     for (let i = 0; i < candidate.cards.length; i++) {
@@ -65,6 +67,16 @@ export function normalizeStudySet(rawParsed, requestedMode) {
 
       // Skip completely empty cards
       if (!question && !answer) continue;
+
+      // Filter out repeated / duplicate questions
+      const normalizedKey = question.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (normalizedKey && seenQuestionPrompts.has(normalizedKey)) {
+        console.warn(`[StudyFlow Normalize] Filtered duplicate flashcard: "${question.slice(0, 40)}..."`);
+        continue;
+      }
+      if (normalizedKey) {
+        seenQuestionPrompts.add(normalizedKey);
+      }
 
       // Ensure stable, unique ID
       let id = card.id ? String(card.id).trim() : `card-${i + 1}`;
@@ -83,7 +95,7 @@ export function normalizeStudySet(rawParsed, requestedMode) {
     if (normalizedCards.length === 0) {
       throw new AIValidationError(
         'EMPTY_CARDS',
-        'All flashcards in response were empty or malformed.',
+        'All flashcards in response were empty or duplicate.',
         'The study set contained empty cards. Try refining your topic or notes.'
       );
     }
@@ -91,7 +103,7 @@ export function normalizeStudySet(rawParsed, requestedMode) {
     candidate.cards = normalizedCards;
   }
 
-  // 3. Normalize Quiz Deck
+  // 3. Normalize Quiz Deck & Deduplicate Questions
   if (requestedMode === 'quiz') {
     if (!Array.isArray(candidate.questions) || candidate.questions.length === 0) {
       throw new AIValidationError(
@@ -102,6 +114,7 @@ export function normalizeStudySet(rawParsed, requestedMode) {
     }
 
     const seenIds = new Set();
+    const seenQuestionPrompts = new Set();
     const normalizedQuestions = [];
 
     for (let i = 0; i < candidate.questions.length; i++) {
@@ -111,10 +124,31 @@ export function normalizeStudySet(rawParsed, requestedMode) {
       const question = (q.question || q.prompt || '').toString().trim();
       if (!question) continue;
 
-      // Options sanitization
-      let options = Array.isArray(q.options)
+      // Filter out repeated / duplicate questions
+      const normalizedKey = question.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (normalizedKey && seenQuestionPrompts.has(normalizedKey)) {
+        console.warn(`[StudyFlow Normalize] Filtered duplicate quiz question: "${question.slice(0, 40)}..."`);
+        continue;
+      }
+      if (normalizedKey) {
+        seenQuestionPrompts.add(normalizedKey);
+      }
+
+      // Options sanitization: trim, filter empty, and deduplicate options within the question
+      const rawOptions = Array.isArray(q.options)
         ? q.options.map(opt => String(opt || '').trim()).filter(Boolean)
         : [];
+
+      // Deduplicate options if model repeated identical options
+      const options = [];
+      const seenOptionTexts = new Set();
+      for (const opt of rawOptions) {
+        const optKey = opt.toLowerCase();
+        if (!seenOptionTexts.has(optKey)) {
+          seenOptionTexts.add(optKey);
+          options.push(opt);
+        }
+      }
 
       if (options.length < 2) {
         console.warn(`[StudyFlow Normalize] Skipping quiz question ${i}: insufficient valid options (${options.length})`);
@@ -138,7 +172,7 @@ export function normalizeStudySet(rawParsed, requestedMode) {
 
       // Boundary clamp
       if (correctAnswer < 0 || correctAnswer >= options.length) {
-        correctAnswer = 0; // Graceful fallback to first option rather than crashing
+        correctAnswer = 0; // Graceful fallback
       }
 
       // Unique ID
@@ -160,7 +194,7 @@ export function normalizeStudySet(rawParsed, requestedMode) {
     if (normalizedQuestions.length === 0) {
       throw new AIValidationError(
         'INVALID_QUIZ_QUESTIONS',
-        'Could not construct at least one valid question with choices.',
+        'Could not construct at least one valid question with distinct choices.',
         'The quiz format was invalid. Please try generating again.'
       );
     }
