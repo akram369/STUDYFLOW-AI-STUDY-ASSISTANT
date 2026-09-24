@@ -171,18 +171,17 @@ A frequent flaw in AI applications is the **race condition**:
 - Node.js 18+ (tested on Node v20 & v24)
 - npm 9+
 
-### Quick Start
+### Quick Start (One Command)
 ```bash
-# 1. Install dependencies
+npm install && npm start
+```
+*That's it!* If `dist/` is not yet built, StudyFlow automatically compiles the frontend bundle and launches the application at **`http://localhost:3001`**.
+
+You can also run the steps individually:
+```bash
 npm install
-
-# 2. Build the production client bundle
-npm run build
-
-# 3. Start the application
 npm start
 ```
-The server will start on **`http://localhost:3001`**, serving both the full interactive client and the backend API.
 
 ### Development Mode (with Hot Module Replacement)
 To run Vite with live reloading alongside the Express backend:
