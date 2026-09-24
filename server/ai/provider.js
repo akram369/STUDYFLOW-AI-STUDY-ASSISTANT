@@ -632,7 +632,7 @@ async function callLLMProvider({ input, mode, difficulty }) {
   const prompt = mode === 'quiz' ? buildQuizPrompt(input, difficulty) : buildFlashcardsPrompt(input, difficulty);
 
   if (provider === 'gemini') {
-    const model = process.env.AI_MODEL || 'gemini-1.5-flash';
+    const model = process.env.AI_MODEL || 'gemini-2.5-flash';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const res = await fetch(url, {
