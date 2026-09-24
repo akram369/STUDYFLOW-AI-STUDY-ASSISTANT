@@ -720,7 +720,12 @@ export async function generateStudyContent({ input, mode, difficulty = 'medium',
 
   // 2. If an AI_API_KEY is configured, call the live LLM
   if (process.env.AI_API_KEY && process.env.AI_API_KEY.trim() !== '') {
-    return await callLLMProvider({ input, mode, difficulty });
+    try {
+      return await callLLMProvider({ input, mode, difficulty });
+    } catch (err) {
+      console.warn(`[StudyFlow AI] Live API error (${err.message}). Gracefully falling back to intelligent synthesis engine.`);
+      // Fall through to Intelligent Synthesis below
+    }
   }
 
   // 3. Otherwise use the intelligent pedagogical mock engine
