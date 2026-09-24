@@ -195,8 +195,45 @@ npm run dev
 ### Running Automated Architectural Verification
 Run the 24-point failure mode test suite:
 ```bash
-node test/verify.js
+npm test
 ```
+
+---
+
+## Pushing to GitHub
+
+To publish this codebase to a new GitHub repository:
+
+```bash
+# 1. Ensure you are on the main branch
+git branch -M main
+
+# 2. Add your GitHub remote URL (replace with your repo URL)
+git remote add origin https://github.com/YOUR_USERNAME/studyflow.git
+
+# 3. Push all commits to GitHub
+git push -u origin main
+```
+
+*(Note: `.env` is strictly excluded in `.gitignore`. Your API keys will never be pushed to Git.)*
+
+---
+
+## Publishing & Deployment
+
+StudyFlow can be deployed seamlessly to any Node.js hosting platform:
+
+### Deploying to Render / Railway / Fly.io
+1. **Connect your GitHub Repository**: Select your pushed `studyflow` repo.
+2. **Configure Build & Start Commands**:
+   - **Build Command:** `npm install && npm run build`
+   - **Start Command:** `npm start`
+3. **Environment Variables**:
+   - Add `AI_API_KEY`: *(Your Gemini or OpenAI API Key)*
+   - Add `AI_PROVIDER`: `gemini`
+   - Add `AI_MODEL`: `gemini-2.5-flash`
+   - *(Optional)* Add `PORT`: `3001` (or use provider's `$PORT`)
+4. **Deploy**: Your app will be live with full static assets and API proxying unified under a single URL!
 
 ---
 

@@ -2,14 +2,20 @@
   "name": "studyflow",
   "private": true,
   "version": "1.0.0",
+  "description": "StudyFlow — Turn anything you know into something you can learn. AI-powered active recall flashcards and quiz application.",
+  "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"yellow.bold,cyan.bold\" \"npm run server\" \"npm run client\"",
     "client": "vite",
     "server": "node server/index.js",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "test": "node test/verify.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { execSync } from 'child_process';
 import { GenerateRequestSchema } from './ai/schemas.js';
 import { generateStudyContent } from './ai/provider.js';
 
@@ -76,8 +77,17 @@ app.post('/api/generate', async (req, res) => {
   }
 });
 
-// Production: serve built static files from dist/ if present
+// Production: serve built static files from dist/
 const distPath = path.join(rootDir, 'dist');
+if (!fs.existsSync(distPath)) {
+  console.log('[StudyFlow] Production bundle not found in dist/. Automatically building frontend with Vite...');
+  try {
+    execSync('npx vite build', { stdio: 'inherit', cwd: rootDir });
+  } catch (err) {
+    console.error('[StudyFlow] Automatic build failed:', err.message);
+  }
+}
+
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   app.get('*', (req, res) => {
