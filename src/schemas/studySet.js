@@ -4,9 +4,9 @@ import { z } from 'zod';
  * Flashcard schema definition
  */
 export const FlashcardSchema = z.object({
-  id: z.string().min(1).default(() => `card-${Math.random().toString(36).substring(2, 9)}`),
-  question: z.string().min(1, 'Question text cannot be empty.').trim(),
-  answer: z.string().min(1, 'Answer text cannot be empty.').trim(),
+  id: z.string().default(() => `card-${Math.random().toString(36).substring(2, 9)}`),
+  question: z.string().trim().min(1, 'Question text cannot be empty.'),
+  answer: z.string().trim().min(1, 'Answer text cannot be empty.'),
 });
 
 /**
@@ -14,7 +14,7 @@ export const FlashcardSchema = z.object({
  */
 export const FlashcardSetSchema = z.object({
   type: z.literal('flashcards'),
-  title: z.string().min(1, 'Title cannot be empty.').default('Flashcard Study Deck'),
+  title: z.string().trim().default('Flashcard Study Deck'),
   difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
   cards: z.array(FlashcardSchema)
     .min(1, 'At least 1 flashcard is required.')
@@ -25,13 +25,13 @@ export const FlashcardSetSchema = z.object({
  * Quiz Question schema definition
  */
 export const QuizQuestionSchema = z.object({
-  id: z.string().min(1).default(() => `q-${Math.random().toString(36).substring(2, 9)}`),
-  question: z.string().min(1, 'Question text cannot be empty.').trim(),
-  options: z.array(z.string().min(1, 'Option text cannot be empty.').trim())
+  id: z.string().default(() => `q-${Math.random().toString(36).substring(2, 9)}`),
+  question: z.string().trim().min(1, 'Question text cannot be empty.'),
+  options: z.array(z.string().trim().min(1, 'Option text cannot be empty.'))
     .min(2, 'Each question must have at least 2 options.')
     .max(6, 'Each question can have at most 6 options.'),
   correctAnswer: z.number().int({ message: 'Correct answer index must be an integer.' }).min(0),
-  explanation: z.string().default('No explanation provided.').trim(),
+  explanation: z.string().trim().default('No explanation provided.'),
 }).refine(
   data => data.correctAnswer >= 0 && data.correctAnswer < data.options.length,
   {
@@ -45,7 +45,7 @@ export const QuizQuestionSchema = z.object({
  */
 export const QuizSetSchema = z.object({
   type: z.literal('quiz'),
-  title: z.string().min(1, 'Title cannot be empty.').default('Active Recall Quiz'),
+  title: z.string().trim().default('Active Recall Quiz'),
   difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
   questions: z.array(QuizQuestionSchema)
     .min(1, 'At least 1 question is required.')
